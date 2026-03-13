@@ -1,8 +1,35 @@
-# 1️⃣ Upgrade pip first
-pip install --upgrade pip
+# ===============================
+# ✅ Simple Colab Setup for Model Deployment
+# ===============================
 
-# 2️⃣ Install required packages one by one to avoid conflicts
-pip install numpy
-pip install pillow
-pip install tensorflow
-pip install streamlit
+# 1️⃣ Upgrade pip to latest version
+!pip install --upgrade pip
+
+# 2️⃣ Clone your GitHub repo
+!git clone https://github.com/urooj89085/brain-tum.git
+%cd brain-tum
+
+# 3️⃣ Install required packages (version-free)
+!pip install numpy pillow tensorflow streamlit
+
+# 4️⃣ Verify installations
+import numpy as np
+import tensorflow as tf
+import PIL
+import streamlit as st
+
+print("✅ All packages installed successfully!")
+print("Numpy:", np.__version__)
+print("TensorFlow:", tf.__version__)
+print("Pillow:", PIL.__version__)
+print("Streamlit:", st.__version__)
+
+# 5️⃣ Optional: Load your trained model for testing
+from tensorflow.keras.models import load_model
+from tensorflow.keras.applications.efficientnet import preprocess_input
+from tensorflow.keras.preprocessing import image
+import numpy as np
+
+# Example: Load model (replace 'brain_tumor_model.h5' with your file)
+# model = load_model("brain_tumor_model.h5")
+# print("✅ Model loaded successfully!")
