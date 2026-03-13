@@ -1,0 +1,5 @@
+streamlit
+tensorflow
+efficientnet
+Pillow
+numpy
