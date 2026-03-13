@@ -1,3 +1,4 @@
+import gdown
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input
@@ -8,9 +9,9 @@ import pandas as pd
 import os
 
 # ---------------------------
-# Download model from Drive if not exists
+# Google Drive model download
 # ---------------------------
-drive_url = "https://drive.google.com/file/d/1F7AfBngiMXLosK0iXxZNU4LSBjLipg5Z/view?usp=drive_link"  # Replace with your model link
+drive_url = "https://drive.google.com/uc?id=1F7AfBngiMXLosK0iXxZNU4LSBjLipg5Z"  # Direct download link
 output_model = "brain_tumor_model.keras"
 
 if not os.path.exists(output_model):
@@ -20,7 +21,7 @@ if not os.path.exists(output_model):
 # Load model
 model = tf.keras.models.load_model(output_model)
 
-classes = ["glioma","meningioma","notumor","pituitary"]
+classes = ["glioma", "meningioma", "notumor", "pituitary"]
 
 # ---------------------------
 # Streamlit UI
