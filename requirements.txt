@@ -1,8 +1,0 @@
-streamlit
-tensorflow
-efficientnet
-Pillow
-numpy
-pandas
-matplotlib
-seaborn
