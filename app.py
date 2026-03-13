@@ -11,7 +11,7 @@ import os
 # ---------------------------
 # Google Drive model download
 # ---------------------------
-drive_url = "https://drive.google.com/uc?id=1F7AfBngiMXLosK0iXxZNU4LSBjLipg5Z"  # Direct download link
+drive_url = "https://drive.google.com/file/d/1F7AfBngiMXLosK0iXxZNU4LSBjLipg5Z/view?usp=drive_link"  # Direct download link
 output_model = "brain_tumor_model.keras"
 
 if not os.path.exists(output_model):
