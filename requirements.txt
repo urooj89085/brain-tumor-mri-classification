@@ -1,7 +1,10 @@
-numpy
-pillow
 tensorflow
 keras
-streamlit
-gdown
+efficientnet
+numpy
 pandas
+scikit-learn
+matplotlib
+seaborn
+Pillow
+h5py
