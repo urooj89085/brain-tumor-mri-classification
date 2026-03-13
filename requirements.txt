@@ -1,4 +1,8 @@
-streamlit
-tensorflow
-numpy
-pillow
+# 1️⃣ Upgrade pip first
+pip install --upgrade pip
+
+# 2️⃣ Install required packages one by one to avoid conflicts
+pip install numpy
+pip install pillow
+pip install tensorflow
+pip install streamlit
