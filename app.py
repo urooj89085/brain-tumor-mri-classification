@@ -1,4 +1,5 @@
-import gdown
+import os
+import requests
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input
@@ -6,17 +7,20 @@ from PIL import Image, ImageOps
 import streamlit as st
 import numpy as np
 import pandas as pd
-import os
 
 # ---------------------------
 # Google Drive model download
 # ---------------------------
-drive_url = "https://drive.google.com/file/d/1F7AfBngiMXLosK0iXxZNU4LSBjLipg5Z/view?usp=drive_link"  # Direct download link
+# Replace YOUR_FILE_ID with your actual file ID from Drive
+file_id = "1F7AfBngiMXLosK0iXxZNU4LSBjLipg5Z"
 output_model = "brain_tumor_model.keras"
 
 if not os.path.exists(output_model):
     with st.spinner("Downloading EfficientNetB0 model..."):
-        gdown.download(drive_url, output_model, quiet=False)
+        url = f"https://drive.google.com/uc?id={file_id}&export=download"
+        r = requests.get(url)
+        with open(output_model, "wb") as f:
+            f.write(r.content)
 
 # Load model
 model = tf.keras.models.load_model(output_model)
