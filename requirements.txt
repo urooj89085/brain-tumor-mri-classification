@@ -1,3 +1,4 @@
+# requirements.txt
 numpy
 pillow
 tensorflow
@@ -5,3 +6,4 @@ keras
 matplotlib
 seaborn
 efficientnet
+streamlit
