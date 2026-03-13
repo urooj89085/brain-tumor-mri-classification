@@ -4,4 +4,4 @@ efficientnet
 Pillow
 numpy
 pandas
-gdown
+requests
