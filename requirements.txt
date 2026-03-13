@@ -1,11 +1,5 @@
 streamlit
 tensorflow
-keras
 efficientnet
-numpy
-pandas
-scikit-learn
-matplotlib
-seaborn
 Pillow
-h5py
+numpy
