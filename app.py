@@ -1,12 +1,12 @@
 import os
-import gdown
+import requests
 import streamlit as st
 import tensorflow as tf
-import numpy as np
-import pandas as pd
 from PIL import Image, ImageOps
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input
+import numpy as np
+import pandas as pd
 
 # -----------------------------
 # Page Config
@@ -18,20 +18,23 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Model Download
+# Model Download (Direct requests)
 # -----------------------------
-file_id = "1F7AfBngiMXLosK0iXxZNU4LSBjLipg5Z"
 model_path = "brain_tumor_model.keras"
+file_id = "1F7AfBngiMXLosK0iXxZNU4LSBjLipg5Z"
 url = f"https://drive.google.com/uc?id={file_id}"
+
+if not os.path.exists(model_path):
+    with st.spinner("Downloading AI model..."):
+        r = requests.get(url)
+        with open(model_path, "wb") as f:
+            f.write(r.content)
 
 # -----------------------------
 # Load Model
 # -----------------------------
 @st.cache_resource
 def load_model():
-    if not os.path.exists(model_path):
-        with st.spinner("Downloading AI model..."):
-            gdown.download(url, model_path, quiet=False)
     return tf.keras.models.load_model(model_path)
 
 model = load_model()
@@ -43,19 +46,15 @@ classes = ["glioma", "meningioma", "notumor", "pituitary"]
 st.title("🧠 Brain Tumor MRI Detection")
 st.write("Upload an MRI image and the AI model will predict the tumor type.")
 
-uploaded_file = st.file_uploader(
-    "Upload MRI Image",
-    type=["jpg","jpeg","png"]
-)
+uploaded_file = st.file_uploader("Upload MRI Image", type=["jpg", "jpeg", "png"])
 
-if uploaded_file is not None:
-
+if uploaded_file:
     img = Image.open(uploaded_file).convert("RGB")
     img = ImageOps.exif_transpose(img)
     st.image(img, caption="Uploaded MRI Image", use_column_width=True)
 
     # Preprocess image
-    img = img.resize((224,224))
+    img = img.resize((224, 224))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
     img_array = preprocess_input(img_array)
