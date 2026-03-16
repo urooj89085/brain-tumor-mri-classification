@@ -3,5 +3,5 @@ tensorflow==2.15.0
 numpy
 pandas
 Pillow
-watchdog==6.0.0
 requests
+watchdog==6.0.0
