@@ -1,73 +1,83 @@
 import os
-import requests
-import tensorflow as tf
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.efficientnet import preprocess_input
-from PIL import Image, ImageOps
+import gdown
 import streamlit as st
+import tensorflow as tf
 import numpy as np
 import pandas as pd
+from PIL import Image, ImageOps
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.efficientnet import preprocess_input
 
-# ---------------------------
-# Google Drive model download
-# ---------------------------
-# Replace YOUR_FILE_ID with your actual file ID from Drive
+# -----------------------------
+# Page Config
+# -----------------------------
+st.set_page_config(
+    page_title="Brain Tumor MRI Detection",
+    page_icon="🧠",
+    layout="centered"
+)
+
+# -----------------------------
+# Model Download
+# -----------------------------
 file_id = "1F7AfBngiMXLosK0iXxZNU4LSBjLipg5Z"
-output_model = "brain_tumor_model.keras"
+model_path = "brain_tumor_model.keras"
 
-if not os.path.exists(output_model):
-    with st.spinner("Downloading EfficientNetB0 model..."):
-        url = f"https://drive.google.com/uc?id={file_id}&export=download"
-        r = requests.get(url)
-        with open(output_model, "wb") as f:
-            f.write(r.content)
+if not os.path.exists(model_path):
+    with st.spinner("Downloading AI model..."):
+        url = f"https://drive.google.com/uc?id={file_id}"
+        gdown.download(url, model_path, quiet=False)
 
-# Load model
-model = tf.keras.models.load_model(output_model)
+# -----------------------------
+# Load Model
+# -----------------------------
+@st.cache_resource
+def load_model():
+    return tf.keras.models.load_model(model_path)
+
+model = load_model()
 
 classes = ["glioma", "meningioma", "notumor", "pituitary"]
 
-# ---------------------------
-# Streamlit UI
-# ---------------------------
+# -----------------------------
+# UI
+# -----------------------------
 st.title("🧠 Brain Tumor MRI Detection")
-st.write("Upload an MRI image to detect tumor type.")
+st.write("Upload an MRI image and the AI model will predict the tumor type.")
 
-uploaded_file = st.file_uploader("Upload MRI Image", type=["jpg","png","jpeg"])
+uploaded_file = st.file_uploader(
+    "Upload MRI Image",
+    type=["jpg","jpeg","png"]
+)
 
-if uploaded_file is not None:
-    try:
-        img = Image.open(uploaded_file)
-        img = ImageOps.exif_transpose(img)  # fix orientation
-        st.image(img, caption="Uploaded Image", use_column_width=True)
+if uploaded_file:
 
-        # Preprocess image for EfficientNetB0
-        img = img.resize((224,224))
-        img_array = image.img_to_array(img)
-        img_array = np.expand_dims(img_array, axis=0)
-        img_array = preprocess_input(img_array)  # EfficientNet preprocessing
+    img = Image.open(uploaded_file)
+    img = ImageOps.exif_transpose(img)
 
-        # Prediction
-        with st.spinner("Predicting..."):
-            prediction = model.predict(img_array)
+    st.image(img, caption="Uploaded MRI Image", use_column_width=True)
 
-        predicted_class = classes[np.argmax(prediction)]
-        confidence = np.max(prediction)
+    # preprocessing
+    img = img.resize((224,224))
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = preprocess_input(img_array)
 
-        # Display prediction
-        st.success(f"Prediction: {predicted_class}")
-        st.write(f"Confidence: {confidence*100:.2f}%")
+    with st.spinner("Analyzing MRI..."):
+        prediction = model.predict(img_array)
 
-        # Display probabilities table
-        prob_df = pd.DataFrame({
-            "Class": classes,
-            "Probability (%)": (prediction[0]*100).round(2)
-        }).sort_values(by="Probability (%)", ascending=False)
-        st.subheader("Class Probabilities")
-        st.table(prob_df)
+    predicted_class = classes[np.argmax(prediction)]
+    confidence = np.max(prediction)
 
-        # Confidence progress bar
-        st.progress(int(confidence*100))
+    st.success(f"Prediction: {predicted_class}")
+    st.write(f"Confidence: {confidence*100:.2f}%")
 
-    except Exception as e:
-        st.error(f"Error processing image: {e}")
+    prob_df = pd.DataFrame({
+        "Class": classes,
+        "Probability (%)": (prediction[0]*100).round(2)
+    }).sort_values(by="Probability (%)", ascending=False)
+
+    st.subheader("Prediction Probabilities")
+    st.table(prob_df)
+
+    st.progress(int(confidence*100))
