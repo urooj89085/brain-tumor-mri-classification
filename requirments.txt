@@ -1,7 +1,7 @@
 streamlit
 tensorflow
 efficientnet
-Pillow
 numpy
 pandas
-requests
+Pillow
+gdown
