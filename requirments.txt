@@ -4,3 +4,4 @@ numpy
 pandas
 Pillow
 gdown
+watchdog==6.0.0
