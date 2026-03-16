@@ -22,25 +22,23 @@ st.set_page_config(
 # -----------------------------
 file_id = "1F7AfBngiMXLosK0iXxZNU4LSBjLipg5Z"
 model_path = "brain_tumor_model.keras"
-
-if not os.path.exists(model_path):
-    with st.spinner("Downloading AI model..."):
-        url = f"https://drive.google.com/uc?id={file_id}"
-        gdown.download(url, model_path, quiet=False)
+url = f"https://drive.google.com/uc?id={file_id}"
 
 # -----------------------------
 # Load Model
 # -----------------------------
 @st.cache_resource
 def load_model():
+    if not os.path.exists(model_path):
+        with st.spinner("Downloading AI model..."):
+            gdown.download(url, model_path, quiet=False)
     return tf.keras.models.load_model(model_path)
 
 model = load_model()
-
 classes = ["glioma", "meningioma", "notumor", "pituitary"]
 
 # -----------------------------
-# UI
+# Streamlit UI
 # -----------------------------
 st.title("🧠 Brain Tumor MRI Detection")
 st.write("Upload an MRI image and the AI model will predict the tumor type.")
@@ -50,14 +48,13 @@ uploaded_file = st.file_uploader(
     type=["jpg","jpeg","png"]
 )
 
-if uploaded_file:
+if uploaded_file is not None:
 
-    img = Image.open(uploaded_file)
+    img = Image.open(uploaded_file).convert("RGB")
     img = ImageOps.exif_transpose(img)
-
     st.image(img, caption="Uploaded MRI Image", use_column_width=True)
 
-    # preprocessing
+    # Preprocess image
     img = img.resize((224,224))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
@@ -72,12 +69,13 @@ if uploaded_file:
     st.success(f"Prediction: {predicted_class}")
     st.write(f"Confidence: {confidence*100:.2f}%")
 
+    # Probabilities Table
     prob_df = pd.DataFrame({
         "Class": classes,
         "Probability (%)": (prediction[0]*100).round(2)
     }).sort_values(by="Probability (%)", ascending=False)
-
     st.subheader("Prediction Probabilities")
     st.table(prob_df)
 
+    # Confidence progress bar
     st.progress(int(confidence*100))
